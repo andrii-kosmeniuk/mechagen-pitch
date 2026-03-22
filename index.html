@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MechaGen — Big Screen Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #030305;
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hover: rgba(255, 255, 255, 0.08);
+    --border: rgba(255, 255, 255, 0.12);
+    --border-highlight: rgba(255, 255, 255, 0.3);
+    
+    --text-main: #ffffff;
+    --text-muted: #cbd5e1;
+    
+    --blue: #3b82f6;
+    --blue-glow: rgba(59, 130, 246, 0.25);
+    --orange: #f97316;
+    --orange-glow: rgba(249, 115, 22, 0.25);
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.25);
+    --red: #ef4444;
+    
+    --font-sans: 'Manrope', sans-serif;
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  html, body {
+    width: 100vw; height: 100vh;
+    background-color: var(--bg); color: var(--text-main);
+    font-family: var(--font-sans); overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Animated Background */
+  .bg-orb {
+    position: fixed; top: 50%; left: 50%;
+    width: 70vw; height: 70vw; border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%);
+    transform: translate(-50%, -50%);
+    pointer-events: none; z-index: -2;
+    animation: pulseOrb 10s ease-in-out infinite alternate;
+  }
+  .bg-grid {
+    position: fixed; inset: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: min(8vw, 100px) min(8vw, 100px);
+    opacity: 0.3; pointer-events: none; z-index: -1;
+    transform: perspective(1000px) rotateX(60deg) translateY(-100px) scale(3);
+    animation: gridMove 20s linear infinite;
+  }
+
+  @keyframes pulseOrb {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  }
+  @keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 min(8vw, 100px); }
+  }
+
+  /* Presentation Structure */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+  
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    padding: clamp(20px, 4vh, 60px) clamp(40px, 6vw, 100px);
+    padding-bottom: clamp(70px, 12vh, 120px);
+    opacity: 0; pointer-events: none; visibility: hidden;
+    z-index: 1;
+  }
+  
+  .slide.active { opacity: 1; pointer-events: all; visibility: visible; z-index: 10; }
+  .slide.exit { opacity: 0; z-index: 1; }
+
+  /* Typography */
+  h1, h2, h3, .font-display { font-family: var(--font-display); }
+  
+  .s-header { margin-bottom: clamp(16px, 3vh, 32px); display: flex; flex-direction: column; gap: clamp(10px, 1.5vh, 20px); }
+  .s-meta { display: flex; align-items: center; gap: 1rem; font-size: clamp(0.9rem, 1.6vh, 1.2rem); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
+  .s-num { color: var(--text-muted); }
+  .s-tag { color: var(--blue); padding: 0.3em 1em; border-radius: 100px; background: var(--blue-glow); border: 1px solid rgba(59, 130, 246, 0.4); }
+  
+  .s-title { font-size: clamp(2.5rem, 6vh, 5.5rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; max-width: 95%; }
+  .text-gradient { background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .text-blue { color: var(--blue); }
+  .text-orange { color: var(--orange); }
+  .text-green { color: var(--green); }
+
+  /* Layout & Cards */
+  .s-body { display: flex; flex-direction: column; gap: clamp(16px, 2.5vh, 32px); flex: 1; min-height: 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2.5vh, 32px); min-height: 0; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2.5vh, 32px); min-height: 0; }
+  .flex-1 { flex: 1; min-height: 0; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: clamp(16px, 2.5vh, 32px); padding: clamp(20px, 3.5vh, 40px);
+    position: relative; overflow: hidden; backdrop-filter: blur(20px);
+    display: flex; flex-direction: column; justify-content: center;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0.9; }
+  .card.accent-blue::before { background: linear-gradient(90deg, transparent, var(--blue), transparent); }
+  .card.accent-orange::before { background: linear-gradient(90deg, transparent, var(--orange), transparent); }
+  .card.accent-green::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+
+  .card h3 { font-size: clamp(1rem, 2vh, 1.4rem); font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: clamp(10px, 2vh, 20px); font-weight: 700; }
+  .card p { font-size: clamp(1.1rem, 2.2vh, 1.6rem); color: var(--text-muted); line-height: 1.4; }
+  .card p strong { color: var(--text-main); font-weight: 700; }
+  
+  .big-stat { font-family: var(--font-display); font-size: clamp(3rem, 7vh, 6rem); font-weight: 800; line-height: 1; margin: clamp(4px, 1vh, 8px) 0 clamp(10px, 2vh, 20px) 0; letter-spacing: -0.02em; }
+  
+  .badge { display: inline-flex; align-items: center; width: fit-content; font-size: clamp(0.9rem, 1.8vh, 1.2rem); font-weight: 700; padding: 0.5em 1em; border-radius: 8px; margin-top: auto; white-space: nowrap; }
+  .badge.blue { background: var(--blue-glow); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+  .badge.orange { background: var(--orange-glow); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.4); }
+  .badge.green { background: var(--green-glow); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+  
+  /* Badge Outline with SVG alignments */
+  .badge.outline { 
+    background: rgba(255,255,255,0.05); 
+    color: var(--text-main); 
+    border: 1px solid rgba(255,255,255,0.2); 
+    font-size: clamp(1.1rem, 2.2vh, 1.4rem); 
+    font-weight: 600; 
+    padding: 0.6em 1.2em; 
+    border-radius: 12px;
+    display: inline-flex; 
+    align-items: center; 
+    gap: 0.6em; 
+  }
+  .badge.outline svg, .badge.outline img {
+    width: clamp(24px, 3.5vh, 32px);
+    height: clamp(24px, 3.5vh, 32px);
+    object-fit: contain;
+  }
+
+  /* Emphasize Cursor Logo */
+  .badge.outline .cursor-logo {
+    width: clamp(36px, 5vh, 46px);
+    height: clamp(36px, 5vh, 46px);
+    margin: -4px 4px -4px -4px;
+  }
+
+  /* Projector-Optimized Table */
+  .vs-table { display: flex; flex-direction: column; gap: clamp(8px, 1.2vh, 12px); width: 100%; margin-top: clamp(10px, 2vh, 20px); }
+  .vs-row { display: flex; gap: clamp(8px, 1.2vh, 12px); align-items: stretch; }
+  .vs-cell { padding: clamp(12px, 2vh, 24px); background: rgba(255,255,255,0.03); border-radius: 12px; font-size: clamp(1.1rem, 2vh, 1.4rem); flex: 1; display: flex; align-items: center; font-weight: 600; }
+  .vs-label { flex: 0.8; color: var(--text-muted); }
+  .vs-bad { color: #fca5a5; background: rgba(239, 68, 68, 0.1); }
+  .vs-good { color: #6ee7b7; background: var(--green-glow); border: 1px solid rgba(16, 185, 129, 0.3); }
+  .vs-bad::before { content: '✕'; margin-right: 0.5rem; opacity: 0.8; }
+  .vs-good::before { content: '✓'; margin-right: 0.5rem; }
+
+  /* Media Wrapper */
+  .media-frame {
+    flex: 1; width: 100%; height: 100%;
+    border-radius: clamp(16px, 2.5vh, 32px);
+    overflow: hidden; position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    background: transparent;
+  }
+  .media-frame img {
+    width: 100%; height: 100%; object-fit: cover; border: none;
+  }
+
+  /* Animations */
+  @keyframes revealSlide {
+    0% { opacity: 0; transform: translateY(4vh) scale(0.97); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .slide.active .s-header { animation: revealSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .slide.active .card, .slide.active .media-frame { opacity: 0; animation: revealSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  .slide.active .card:nth-child(1), .slide.active .media-frame:nth-child(1) { animation-delay: 0.1s; }
+  .slide.active .card:nth-child(2), .slide.active .media-frame:nth-child(2) { animation-delay: 0.2s; }
+  .slide.active .card:nth-child(3), .slide.active .media-frame:nth-child(3) { animation-delay: 0.3s; }
+
+  /* Navigation Base */
+  .controls {
+    position: fixed; bottom: clamp(20px, 4vh, 40px); left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 clamp(40px, 6vw, 100px); z-index: 100; pointer-events: none;
+  }
+  .progress-container { display: flex; gap: 12px; pointer-events: all; }
+  .progress-bar { width: clamp(40px, 5vw, 60px); height: 6px; background: var(--border); border-radius: 6px; cursor: pointer; transition: all 0.4s ease; }
+  .progress-bar.active { background: var(--blue); width: clamp(70px, 9vw, 100px); box-shadow: 0 0 15px var(--blue-glow); }
+  
+  .nav-arrows { display: flex; gap: 12px; pointer-events: all; }
+  .nav-btn {
+    width: clamp(48px, 6vh, 64px); height: clamp(48px, 6vh, 64px); border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--border);
+    color: var(--text-main); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .nav-btn:hover { background: var(--blue-glow); border-color: var(--blue); transform: scale(1.1); }
+  .nav-btn svg { width: clamp(20px, 3vh, 30px); height: clamp(20px, 3vh, 30px); }
+
+  /* Invisible click zones for presenters */
+  .click-zone { position: fixed; top: 0; bottom: 0; width: 15vw; z-index: 50; cursor: pointer; }
+  .zone-left { left: 0; } .zone-right { right: 0; }
+</style>
+</head>
+<body>
+
+<div class="bg-orb"></div>
+<div class="bg-grid"></div>
+
+<!-- Left/Right screen clicks advance the presentation safely -->
+<div class="click-zone zone-left" onclick="prev()"></div>
+<div class="click-zone zone-right" onclick="next()"></div>
+
+<div class="deck">
+
+  <!-- SLIDE 01 -->
+  <div class="slide active">
+    <div class="s-header">
+      <div class="s-meta"><span class="s-num">01 / 05</span><span class="s-tag">The Market Problem</span></div>
+      <h1 class="s-title text-gradient">Robotics runs on <span class="text-blue">decades-old</span> CAD workflows.</h1>
+    </div>
+
+    <div class="s-body">
+      <div class="grid-2 flex-1">
+        <div class="card accent-blue">
+          <h3>The Bottleneck</h3>
+          <p><strong>CAD teams at robotics companies and OEMs are stuck.</strong><br><br>Engineers receive legacy supplier drawings as scanned PDFs or sketches. Modern CAD software (SolidWorks, CATIA) cannot natively interpret these into 3D.</p>
+          <div class="badge blue">~2.3M engineers affected</div>
+        </div>
+        <div class="card accent-orange">
+          <h3>The Cost</h3>
+          <div class="big-stat text-orange">3 Days</div>
+          <p>The average time it takes a CAD engineer to manually rebuild geometry from a 2D sketch into a 3D model.<br><br><strong>Costs ~$500 per drawing.</strong> Millions of parts are stuck in backlog.</p>
+          <div class="badge orange">$3.5B wasted annually</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 02: PRODUCT DEMO IMAGE & TECH STACK -->
+  <div class="slide">
+    <div class="s-header">
+      <div class="s-meta"><span class="s-num">02 / 05</span><span class="s-tag">Our Solution</span></div>
+      <h1 class="s-title text-gradient">MechaGen — any blueprint in,<br><span class="text-blue">3D model out.</span></h1>
+    </div>
+
+    <div class="s-body grid-2">
+      <!-- Left Column: Pitch & Stack -->
+      <div style="display: flex; flex-direction: column; gap: clamp(16px, 2.5vh, 32px);">
+        <div class="card accent-blue">
+          <p>Converts a text prompt, photo, or hand-drawn sketch into a production-ready 3D model in <strong>under 30 seconds</strong>.</p>
+          <div class="vs-table">
+            <div class="vs-row">
+              <div class="vs-cell vs-label">Time to 3D</div>
+              <div class="vs-cell vs-bad">3 Days</div>
+              <div class="vs-cell vs-good">30 Seconds</div>
+            </div>
+            <div class="vs-row">
+              <div class="vs-cell vs-label">Output</div>
+              <div class="vs-cell vs-bad">Dumb Mesh</div>
+              <div class="vs-cell vs-good">Parametric SCAD</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card accent-green" style="flex: 1; justify-content: flex-start; padding-top: clamp(16px, 2.5vh, 32px);">
+          <h3>Created With</h3>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: clamp(12px, 2vh, 16px); margin-top: clamp(8px, 1.5vh, 16px);">
+            
+            <span class="badge outline">
+              <svg viewBox="0 0 24 24" class="cursor-logo" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1.5 L21.03 6.75 L21.03 17.25 L12 22.5 L2.97 17.25 L2.97 6.75 Z" fill="#ffffff" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"/>
+                <path d="M2.97 6.75 L21.03 6.75 L12 22.5 L12 12 Z" fill="#030305" />
+              </svg>
+              Cursor
+            </span>
+            
+            <span class="badge outline">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L22 20H2z"/></svg>
+              Vercel
+            </span>
+            
+            <span class="badge outline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="6.5"/></svg>
+              Featherless.ai
+            </span>
+            
+            <span class="badge outline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#FFD02F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l5-10 4 10 5-10 4 10"/></svg>
+              Miro
+            </span>
+            
+            <span class="badge outline">
+              <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.64 12.2c0-.83-.07-1.63-.2-2.4H12v4.54h6.53a5.55 5.55 0 01-2.4 3.64v3.02h3.87c2.26-2.08 3.56-5.14 3.56-8.8z"/><path fill="#34A853" d="M12 24c3.27 0 6.01-1.08 8.01-2.94l-3.87-3.02c-1.09.73-2.48 1.16-4.14 1.16-3.18 0-5.87-2.15-6.84-5.04H1.18v3.13A11.97 11.97 0 0012 24z"/><path fill="#FBBC05" d="M5.16 14.16a7.22 7.22 0 010-4.32V6.71H1.18a11.98 11.98 0 000 10.58l3.98-3.13z"/><path fill="#EA4335" d="M12 4.8c1.78 0 3.38.61 4.64 1.81l3.48-3.48C18.01 1.18 15.27 0 12 0 7.38 0 3.32 2.67 1.18 6.71l3.98 3.13c.97-2.89 3.66-5.04 6.84-5.04z"/></svg>
+              Google
+            </span>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Static Photo -->
+      <div class="media-frame" style="border: none; box-shadow: none;">
+        <img src="https://i.imgur.com/G8MYwmp.jpeg" alt="MechaGen Application Preview" style="border-radius: clamp(16px, 2.5vh, 32px); box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);" />
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 03 -->
+  <div class="slide">
+    <div class="s-header">
+      <div class="s-meta"><span class="s-num">03 / 05</span><span class="s-tag">Business Model</span></div>
+      <h1 class="s-title text-gradient">Clear unit economics with<br><span class="text-green">immediate scalability.</span></h1>
+    </div>
+
+    <div class="s-body grid-3">
+      <div class="card accent-blue">
+        <h3>Tier 1: Pay-Per-Use</h3>
+        <div class="big-stat text-blue">$20</div>
+        <p>Average price per generation.<br><br><strong>Target:</strong> SME fabricators.<br>Self-serve via credit card. No sales cycle.</p>
+        <div class="badge blue">95% Gross Margin</div>
+      </div>
+      
+      <div class="card accent-orange">
+        <h3>Tier 2: Team Sub</h3>
+        <div class="big-stat text-orange">$299<span style="font-size: 0.4em; color: var(--text-muted)">/mo</span></div>
+        <p>Per engineering team.<br><br><strong>Target:</strong> Robotics startups.<br>Unlimited generations and version history.</p>
+        <div class="badge orange">87% Gross Margin</div>
+      </div>
+
+      <div class="card accent-green">
+        <h3>Tier 3: Enterprise</h3>
+        <div class="big-stat text-green">$50k<span style="font-size: 0.4em; color: var(--text-muted)">+</span></div>
+        <p>Per year, per facility.<br><br><strong>Target:</strong> BMW, Airbus.<br>On-prem deployment, custom model fine-tuning.</p>
+        <div class="badge green">Phase 3 Target</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 04: GO-TO-MARKET PLAN -->
+  <div class="slide">
+    <div class="s-header">
+      <div class="s-meta"><span class="s-num">04 / 05</span><span class="s-tag">Go-to-Market Plan</span></div>
+      <h1 class="s-title text-gradient">The roadmap to our <span class="text-orange">first 10 customers.</span></h1>
+    </div>
+
+    <div class="s-body grid-2">
+      <div class="card accent-blue">
+        <h3>1. University Robotics Clubs</h3>
+        <p>We provide MechaGen to university engineering teams and robotics clubs for free.<br><br><strong>Grassroots Adoption:</strong> By embedding our tool in student workflows, we build extreme loyalty with the next generation of engineers who will champion MechaGen in the enterprise.</p>
+      </div>
+
+      <div class="card accent-orange">
+        <h3>2. Events & Social Media</h3>
+        <p><strong>Boots on the ground & digital reach.</strong> We actively attend and organize robotics events, technical conferences, and job fairs.<br><br>This is amplified by targeted <strong>social media promotion</strong>, showcasing live generation demos to build viral adoption among CAD engineers.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 05: IMAGE FROM IMGUR -->
+  <div class="slide">
+    <div class="s-header">
+      <div class="s-meta"><span class="s-num">05 / 05</span><span class="s-tag">Why Us · The Ask</span></div>
+      <h1 class="s-title text-gradient">The technology window <span class="text-blue">just opened.</span></h1>
+    </div>
+
+    <div class="s-body grid-2">
+      <!-- Left Column: The Team & Ask -->
+      <div style="display: flex; flex-direction: column; gap: clamp(16px, 2.5vh, 32px);">
+        <div class="card accent-green" style="flex: 1;">
+          <h3>Team & Market Timing</h3>
+          <p>Our team brings perfectly <strong>complementary skills</strong> across AI, mechanical engineering, and product scaling, backed by a clear vision to deliver a fully working enterprise solution.<br><br>We are building at the exact intersection of <strong>hyper-growth in both Robotics and AI</strong>—the market mandate is here now.</p>
+        </div>
+        <div class="card" style="background: var(--blue-glow); border-color: rgba(59, 130, 246, 0.5);">
+          <h3>The Ask</h3>
+          <p>We are actively looking for:<br><br>
+            • <strong>Our first pilot customer.</strong><br>
+            • <strong>A technical co-founder</strong> with a deep CAD/CAM background.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Column: Static Image -->
+      <div class="media-frame" style="border: none; box-shadow: none;">
+        <img src="https://i.imgur.com/sjpafmo.png" alt="MechaGen Overview" style="border-radius: clamp(16px, 2.5vh, 32px); box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);" />
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation Controls -->
+<div class="controls">
+  <div style="width: 100px;"></div>
+  <div class="progress-container" id="progressBars">
+    <div class="progress-bar active" onclick="goTo(0)"></div>
+    <div class="progress-bar" onclick="goTo(1)"></div>
+    <div class="progress-bar" onclick="goTo(2)"></div>
+    <div class="progress-bar" onclick="goTo(3)"></div>
+    <div class="progress-bar" onclick="goTo(4)"></div>
+  </div>
+  <div class="nav-arrows">
+    <button class="nav-btn" onclick="prev()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="nav-btn" onclick="next()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  let cur = 0;
+  const slides = document.querySelectorAll('.slide');
+  const bars = document.querySelectorAll('.progress-bar');
+  let isAnimating = false;
+
+  function goTo(n) {
+    if (n === cur || isAnimating) return;
+    isAnimating = true;
+    
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    
+    const oldCur = cur;
+    setTimeout(() => {
+      slides[oldCur].classList.remove('exit');
+      isAnimating = false;
+    }, 600); // Matches CSS animation duration
+    
+    cur = n;
+    slides[cur].classList.add('active');
+    bars.forEach((b, i) => b.classList.toggle('active', i === cur));
+  }
+
+  function next() { if (cur < slides.length - 1) goTo(cur + 1); }
+  function prev() { if (cur > 0) goTo(cur - 1); }
+
+  // Keyboard Navigation
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight', 'ArrowDown', ' ', 'Enter', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
+    if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+  });
+
+  // Touch Swipe Navigation
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchEndX - touchStartX;
+    if (Math.abs(diff) > 50) diff < 0 ? next() : prev();
+  });
+</script>
+</body>
+</html>
