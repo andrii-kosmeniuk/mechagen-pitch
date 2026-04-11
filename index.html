@@ -1,464 +1,501 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MechaGen — Big Screen Pitch Deck</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #030305;
-    --surface: rgba(255, 255, 255, 0.04);
-    --surface-hover: rgba(255, 255, 255, 0.08);
-    --border: rgba(255, 255, 255, 0.12);
-    --border-highlight: rgba(255, 255, 255, 0.3);
-    
-    --text-main: #ffffff;
-    --text-muted: #cbd5e1;
-    
-    --blue: #3b82f6;
-    --blue-glow: rgba(59, 130, 246, 0.25);
-    --orange: #f97316;
-    --orange-glow: rgba(249, 115, 22, 0.25);
-    --green: #10b981;
-    --green-glow: rgba(16, 185, 129, 0.25);
-    --red: #ef4444;
-    
-    --font-sans: 'Manrope', sans-serif;
-    --font-display: 'Plus Jakarta Sans', sans-serif;
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MicroPayout AI — Pitch</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  html, body {
-    width: 100vw; height: 100vh;
-    background-color: var(--bg); color: var(--text-main);
-    font-family: var(--font-sans); overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
 
-  /* Animated Background */
-  .bg-orb {
-    position: fixed; top: 50%; left: 50%;
-    width: 70vw; height: 70vw; border-radius: 50%;
-    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 60%);
-    transform: translate(-50%, -50%);
-    pointer-events: none; z-index: -2;
-    animation: pulseOrb 10s ease-in-out infinite alternate;
-  }
-  .bg-grid {
-    position: fixed; inset: 0;
-    background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-    background-size: min(8vw, 100px) min(8vw, 100px);
-    opacity: 0.3; pointer-events: none; z-index: -1;
-    transform: perspective(1000px) rotateX(60deg) translateY(-100px) scale(3);
-    animation: gridMove 20s linear infinite;
-  }
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
 
-  @keyframes pulseOrb {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-  }
-  @keyframes gridMove {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 min(8vw, 100px); }
-  }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 120px;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+    }
 
-  /* Presentation Structure */
-  .deck { width: 100vw; height: 100vh; position: relative; }
-  
-  .slide {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    padding: clamp(20px, 4vh, 60px) clamp(40px, 6vw, 100px);
-    padding-bottom: clamp(70px, 12vh, 120px);
-    opacity: 0; pointer-events: none; visibility: hidden;
-    z-index: 1;
-  }
-  
-  .slide.active { opacity: 1; pointer-events: all; visibility: visible; z-index: 10; }
-  .slide.exit { opacity: 0; z-index: 1; }
+    .slide.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: all;
+    }
 
-  /* Typography */
-  h1, h2, h3, .font-display { font-family: var(--font-display); }
-  
-  .s-header { margin-bottom: clamp(16px, 3vh, 32px); display: flex; flex-direction: column; gap: clamp(10px, 1.5vh, 20px); }
-  .s-meta { display: flex; align-items: center; gap: 1rem; font-size: clamp(0.9rem, 1.6vh, 1.2rem); font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase; }
-  .s-num { color: var(--text-muted); }
-  .s-tag { color: var(--blue); padding: 0.3em 1em; border-radius: 100px; background: var(--blue-glow); border: 1px solid rgba(59, 130, 246, 0.4); }
-  
-  .s-title { font-size: clamp(2.5rem, 6vh, 5.5rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; max-width: 95%; }
-  .text-gradient { background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .text-blue { color: var(--blue); }
-  .text-orange { color: var(--orange); }
-  .text-green { color: var(--green); }
+    /* slide accent colours */
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent, #4f46e5);
+    }
 
-  /* Layout & Cards */
-  .s-body { display: flex; flex-direction: column; gap: clamp(16px, 2.5vh, 32px); flex: 1; min-height: 0; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2.5vh, 32px); min-height: 0; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2.5vh, 32px); min-height: 0; }
-  .flex-1 { flex: 1; min-height: 0; }
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent, #4f46e5);
+      margin-bottom: 20px;
+    }
 
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: clamp(16px, 2.5vh, 32px); padding: clamp(20px, 3.5vh, 40px);
-    position: relative; overflow: hidden; backdrop-filter: blur(20px);
-    display: flex; flex-direction: column; justify-content: center;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  
-  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0.9; }
-  .card.accent-blue::before { background: linear-gradient(90deg, transparent, var(--blue), transparent); }
-  .card.accent-orange::before { background: linear-gradient(90deg, transparent, var(--orange), transparent); }
-  .card.accent-green::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+    h1 {
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 700;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 28px;
+    }
 
-  .card h3 { font-size: clamp(1rem, 2vh, 1.4rem); font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: clamp(10px, 2vh, 20px); font-weight: 700; }
-  .card p { font-size: clamp(1.1rem, 2.2vh, 1.6rem); color: var(--text-muted); line-height: 1.4; }
-  .card p strong { color: var(--text-main); font-weight: 700; }
-  
-  .big-stat { font-family: var(--font-display); font-size: clamp(3rem, 7vh, 6rem); font-weight: 800; line-height: 1; margin: clamp(4px, 1vh, 8px) 0 clamp(10px, 2vh, 20px) 0; letter-spacing: -0.02em; }
-  
-  .badge { display: inline-flex; align-items: center; width: fit-content; font-size: clamp(0.9rem, 1.8vh, 1.2rem); font-weight: 700; padding: 0.5em 1em; border-radius: 8px; margin-top: auto; white-space: nowrap; }
-  .badge.blue { background: var(--blue-glow); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
-  .badge.orange { background: var(--orange-glow); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.4); }
-  .badge.green { background: var(--green-glow); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
-  
-  /* Badge Outline with SVG alignments */
-  .badge.outline { 
-    background: rgba(255,255,255,0.05); 
-    color: var(--text-main); 
-    border: 1px solid rgba(255,255,255,0.2); 
-    font-size: clamp(1.1rem, 2.2vh, 1.4rem); 
-    font-weight: 600; 
-    padding: 0.6em 1.2em; 
-    border-radius: 12px;
-    display: inline-flex; 
-    align-items: center; 
-    gap: 0.6em; 
-  }
-  .badge.outline svg, .badge.outline img {
-    width: clamp(24px, 3.5vh, 32px);
-    height: clamp(24px, 3.5vh, 32px);
-    object-fit: contain;
-  }
+    h1 span { color: var(--accent, #4f46e5); }
 
-  /* Emphasize Cursor Logo */
-  .badge.outline .cursor-logo {
-    width: clamp(36px, 5vh, 46px);
-    height: clamp(36px, 5vh, 46px);
-    margin: -4px 4px -4px -4px;
-  }
+    .subtitle {
+      font-size: clamp(16px, 2vw, 22px);
+      color: #9ca3af;
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 40px;
+    }
 
-  /* Projector-Optimized Table */
-  .vs-table { display: flex; flex-direction: column; gap: clamp(8px, 1.2vh, 12px); width: 100%; margin-top: clamp(10px, 2vh, 20px); }
-  .vs-row { display: flex; gap: clamp(8px, 1.2vh, 12px); align-items: stretch; }
-  .vs-cell { padding: clamp(12px, 2vh, 24px); background: rgba(255,255,255,0.03); border-radius: 12px; font-size: clamp(1.1rem, 2vh, 1.4rem); flex: 1; display: flex; align-items: center; font-weight: 600; }
-  .vs-label { flex: 0.8; color: var(--text-muted); }
-  .vs-bad { color: #fca5a5; background: rgba(239, 68, 68, 0.1); }
-  .vs-good { color: #6ee7b7; background: var(--green-glow); border: 1px solid rgba(16, 185, 129, 0.3); }
-  .vs-bad::before { content: '✕'; margin-right: 0.5rem; opacity: 0.8; }
-  .vs-good::before { content: '✓'; margin-right: 0.5rem; }
+    .points {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 800px;
+    }
 
-  /* Media Wrapper */
-  .media-frame {
-    flex: 1; width: 100%; height: 100%;
-    border-radius: clamp(16px, 2.5vh, 32px);
-    overflow: hidden; position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    background: transparent;
-  }
-  .media-frame img {
-    width: 100%; height: 100%; object-fit: cover; border: none;
-  }
+    .point {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      font-size: clamp(14px, 1.5vw, 18px);
+      line-height: 1.5;
+      color: #d1d5db;
+    }
 
-  /* Animations */
-  @keyframes revealSlide {
-    0% { opacity: 0; transform: translateY(4vh) scale(0.97); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  .slide.active .s-header { animation: revealSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-  .slide.active .card, .slide.active .media-frame { opacity: 0; animation: revealSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-  .slide.active .card:nth-child(1), .slide.active .media-frame:nth-child(1) { animation-delay: 0.1s; }
-  .slide.active .card:nth-child(2), .slide.active .media-frame:nth-child(2) { animation-delay: 0.2s; }
-  .slide.active .card:nth-child(3), .slide.active .media-frame:nth-child(3) { animation-delay: 0.3s; }
+    .point-icon {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--accent-dim, #1e1b4b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-top: 1px;
+    }
 
-  /* Navigation Base */
-  .controls {
-    position: fixed; bottom: clamp(20px, 4vh, 40px); left: 0; right: 0;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 clamp(40px, 6vw, 100px); z-index: 100; pointer-events: none;
-  }
-  .progress-container { display: flex; gap: 12px; pointer-events: all; }
-  .progress-bar { width: clamp(40px, 5vw, 60px); height: 6px; background: var(--border); border-radius: 6px; cursor: pointer; transition: all 0.4s ease; }
-  .progress-bar.active { background: var(--blue); width: clamp(70px, 9vw, 100px); box-shadow: 0 0 15px var(--blue-glow); }
-  
-  .nav-arrows { display: flex; gap: 12px; pointer-events: all; }
-  .nav-btn {
-    width: clamp(48px, 6vh, 64px); height: clamp(48px, 6vh, 64px); border-radius: 50%;
-    background: var(--surface); border: 2px solid var(--border);
-    color: var(--text-main); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s ease;
-  }
-  .nav-btn:hover { background: var(--blue-glow); border-color: var(--blue); transform: scale(1.1); }
-  .nav-btn svg { width: clamp(20px, 3vh, 30px); height: clamp(20px, 3vh, 30px); }
+    .point strong { color: #fff; }
 
-  /* Invisible click zones for presenters */
-  .click-zone { position: fixed; top: 0; bottom: 0; width: 15vw; z-index: 50; cursor: pointer; }
-  .zone-left { left: 0; } .zone-right { right: 0; }
-</style>
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 900px;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent, #4f46e5);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .card p {
+      font-size: 14px;
+      color: #9ca3af;
+      line-height: 1.6;
+    }
+
+    .card p strong { color: #e5e7eb; }
+
+    /* agent pipeline */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      max-width: 860px;
+      margin-bottom: 32px;
+    }
+
+    .agent-box {
+      flex: 1;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .agent-box .agent-name {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent, #4f46e5);
+      margin-bottom: 6px;
+    }
+
+    .agent-box p {
+      font-size: 13px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .arrow {
+      flex-shrink: 0;
+      width: 32px;
+      text-align: center;
+      font-size: 18px;
+      color: #374151;
+    }
+
+    /* competitor table */
+    .comp-table {
+      width: 100%;
+      max-width: 820px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .comp-table th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6b7280;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    .comp-table td {
+      padding: 12px 16px;
+      color: #d1d5db;
+      border-bottom: 1px solid #111;
+    }
+
+    .comp-table tr.us td { color: #fff; background: #0f172a; }
+    .comp-table tr.us td:first-child { font-weight: 700; color: var(--accent, #4f46e5); }
+
+    .check { color: #10b981; }
+    .cross { color: #ef4444; }
+
+    /* nav */
+    .nav {
+      position: fixed;
+      bottom: 32px;
+      right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 100;
+    }
+
+    .nav-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1px solid #222;
+      background: #111;
+      color: #9ca3af;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover { background: #1f2937; color: #fff; }
+
+    .slide-counter {
+      font-size: 12px;
+      color: #4b5563;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* progress dots */
+    .dots {
+      position: fixed;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #374151;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .dot.active { background: var(--accent-global, #4f46e5); width: 20px; border-radius: 3px; }
+
+    /* slide-specific accents */
+    #s1 { --accent: #ef4444; --accent-dim: #1f0707; }
+    #s2 { --accent: #10b981; --accent-dim: #052e16; }
+    #s3 { --accent: #4f46e5; --accent-dim: #1e1b4b; }
+    #s4 { --accent: #f59e0b; --accent-dim: #1c1407; }
+    #s5 { --accent: #8b5cf6; --accent-dim: #1a1030; }
+    #s6 { --accent: #06b6d4; --accent-dim: #031a1f; }
+  </style>
 </head>
 <body>
 
-<div class="bg-orb"></div>
-<div class="bg-grid"></div>
-
-<!-- Left/Right screen clicks advance the presentation safely -->
-<div class="click-zone zone-left" onclick="prev()"></div>
-<div class="click-zone zone-right" onclick="next()"></div>
-
 <div class="deck">
 
-  <!-- SLIDE 01 -->
-  <div class="slide active">
-    <div class="s-header">
-      <div class="s-meta"><span class="s-num">01 / 05</span><span class="s-tag">The Market Problem</span></div>
-      <h1 class="s-title text-gradient">Robotics runs on <span class="text-blue">decades-old</span> CAD workflows.</h1>
-    </div>
-
-    <div class="s-body">
-      <div class="grid-2 flex-1">
-        <div class="card accent-blue">
-          <h3>The Bottleneck</h3>
-          <p><strong>CAD teams at robotics companies and OEMs are stuck.</strong><br><br>Engineers receive legacy supplier drawings as scanned PDFs or sketches. Modern CAD software (SolidWorks, CATIA) cannot natively interpret these into 3D.</p>
-          <div class="badge blue">~2.3M engineers affected</div>
-        </div>
-        <div class="card accent-orange">
-          <h3>The Cost</h3>
-          <div class="big-stat text-orange">3 Days</div>
-          <p>The average time it takes a CAD engineer to manually rebuild geometry from a 2D sketch into a 3D model.<br><br><strong>Costs ~$500 per drawing.</strong> Millions of parts are stuck in backlog.</p>
-          <div class="badge orange">$3.5B wasted annually</div>
-        </div>
+  <!-- ── Slide 1: Problem ───────────────────────────────────────────────── -->
+  <section class="slide active" id="s1">
+    <div class="tag">The Problem</div>
+    <h1>Paying API creators<br/>is <span>broken</span></h1>
+    <p class="subtitle">
+      Platforms like ElevenLabs, Replicate, and HuggingFace pay millions of micro-earnings
+      to API contributors every month. The process is manual, slow, and leaking money.
+    </p>
+    <div class="points">
+      <div class="point">
+        <div class="point-icon">💸</div>
+        <div><strong>Fees eat the payout.</strong> A $3 wire fee on a $40 earning is a 7% tax on the creator. Nobody optimises when to send.</div>
+      </div>
+      <div class="point">
+        <div class="point-icon">🤖</div>
+        <div><strong>Fraud is rampant.</strong> Self-click farms and bot accounts inflate earnings. Manual review doesn't scale past 100 users.</div>
+      </div>
+      <div class="point">
+        <div class="point-icon">🌍</div>
+        <div><strong>Cross-border payments are a nightmare.</strong> 16 currencies, different rails, different compliance rules — no single tool handles all of it.</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- SLIDE 02: PRODUCT DEMO IMAGE & TECH STACK -->
-  <div class="slide">
-    <div class="s-header">
-      <div class="s-meta"><span class="s-num">02 / 05</span><span class="s-tag">Our Solution</span></div>
-      <h1 class="s-title text-gradient">MechaGen — any blueprint in,<br><span class="text-blue">3D model out.</span></h1>
-    </div>
-
-    <div class="s-body grid-2">
-      <!-- Left Column: Pitch & Stack -->
-      <div style="display: flex; flex-direction: column; gap: clamp(16px, 2.5vh, 32px);">
-        <div class="card accent-blue">
-          <p>Converts a text prompt, photo, or hand-drawn sketch into a production-ready 3D model in <strong>under 30 seconds</strong>.</p>
-          <div class="vs-table">
-            <div class="vs-row">
-              <div class="vs-cell vs-label">Time to 3D</div>
-              <div class="vs-cell vs-bad">3 Days</div>
-              <div class="vs-cell vs-good">30 Seconds</div>
-            </div>
-            <div class="vs-row">
-              <div class="vs-cell vs-label">Output</div>
-              <div class="vs-cell vs-bad">Dumb Mesh</div>
-              <div class="vs-cell vs-good">Parametric SCAD</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="card accent-green" style="flex: 1; justify-content: flex-start; padding-top: clamp(16px, 2.5vh, 32px);">
-          <h3>Created With</h3>
-          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: clamp(12px, 2vh, 16px); margin-top: clamp(8px, 1.5vh, 16px);">
-            
-            <span class="badge outline">
-              <svg viewBox="0 0 24 24" class="cursor-logo" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1.5 L21.03 6.75 L21.03 17.25 L12 22.5 L2.97 17.25 L2.97 6.75 Z" fill="#ffffff" stroke="#ffffff" stroke-width="1" stroke-linejoin="round"/>
-                <path d="M2.97 6.75 L21.03 6.75 L12 22.5 L12 12 Z" fill="#030305" />
-              </svg>
-              Cursor
-            </span>
-            
-            <span class="badge outline">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L22 20H2z"/></svg>
-              Vercel
-            </span>
-            
-            <span class="badge outline">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="6.5"/></svg>
-              Featherless.ai
-            </span>
-            
-            <span class="badge outline">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#FFD02F" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l5-10 4 10 5-10 4 10"/></svg>
-              Miro
-            </span>
-            
-            <span class="badge outline">
-              <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.64 12.2c0-.83-.07-1.63-.2-2.4H12v4.54h6.53a5.55 5.55 0 01-2.4 3.64v3.02h3.87c2.26-2.08 3.56-5.14 3.56-8.8z"/><path fill="#34A853" d="M12 24c3.27 0 6.01-1.08 8.01-2.94l-3.87-3.02c-1.09.73-2.48 1.16-4.14 1.16-3.18 0-5.87-2.15-6.84-5.04H1.18v3.13A11.97 11.97 0 0012 24z"/><path fill="#FBBC05" d="M5.16 14.16a7.22 7.22 0 010-4.32V6.71H1.18a11.98 11.98 0 000 10.58l3.98-3.13z"/><path fill="#EA4335" d="M12 4.8c1.78 0 3.38.61 4.64 1.81l3.48-3.48C18.01 1.18 15.27 0 12 0 7.38 0 3.32 2.67 1.18 6.71l3.98 3.13c.97-2.89 3.66-5.04 6.84-5.04z"/></svg>
-              Google
-            </span>
-
-          </div>
-        </div>
+  <!-- ── Slide 2: Solution ──────────────────────────────────────────────── -->
+  <section class="slide" id="s2">
+    <div class="tag">The Solution</div>
+    <h1>MicroPayout <span>AI</span></h1>
+    <p class="subtitle">
+      An autonomous AI pipeline that validates, times, invoices, and dispatches
+      every payout — without a human touching it.
+    </p>
+    <div class="points">
+      <div class="point">
+        <div class="point-icon">🛡️</div>
+        <div><strong>Validate before you pay.</strong> Every payout is screened for fraud signals — caller diversity, IBAN validity, bot patterns — before a cent moves.</div>
       </div>
-
-      <!-- Right Column: Static Photo -->
-      <div class="media-frame" style="border: none; box-shadow: none;">
-        <img src="https://i.imgur.com/jHA5o89.jpeg" alt="MechaGen Application Preview" style="border-radius: clamp(16px, 2.5vh, 32px); box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);" />
+      <div class="point">
+        <div class="point-icon">📅</div>
+        <div><strong>Send on the cheapest day.</strong> Real-time Wise fee quotes across 10+ currencies. Tuesday saves 0.3% vs Friday — automated, every time.</div>
+      </div>
+      <div class="point">
+        <div class="point-icon">⚠️</div>
+        <div><strong>Escalate what matters.</strong> Transactions above $100 are automatically held and a voice alert fires for manual review. Everything else ships.</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- SLIDE 03 -->
-  <div class="slide">
-    <div class="s-header">
-      <div class="s-meta"><span class="s-num">03 / 05</span><span class="s-tag">Business Model</span></div>
-      <h1 class="s-title text-gradient">Clear unit economics with<br><span class="text-green">immediate scalability.</span></h1>
-    </div>
-
-    <div class="s-body grid-3">
-      <div class="card accent-blue">
-        <h3>Tier 1: Free Plan</h3>
-        <div class="big-stat text-blue">$0</div>
-        <p>Experience the product.<br><br><strong>Target:</strong> Students & hobbyists.<br><strong>Restriction:</strong> 1 generation per day.</p>
-        <div class="badge blue">Product-Led Growth</div>
+  <!-- ── Slide 3: AI Agents ─────────────────────────────────────────────── -->
+  <section class="slide" id="s3">
+    <div class="tag">Under the Hood</div>
+    <h1>Three <span>autonomous</span><br/>agents. One pipeline.</h1>
+    <div class="pipeline">
+      <div class="agent-box">
+        <div class="agent-name">① Compliance</div>
+        <p>Fetches API usage logs, validates IBANs, detects self-click fraud and bot accounts. Blocks or clears each payout.</p>
       </div>
-      
-      <div class="card accent-orange">
-        <h3>Tier 2: Solo Pro</h3>
-        <div class="big-stat text-orange">$199<span style="font-size: 0.4em; color: var(--text-muted)">/mo</span></div>
-        <p>For solo developers & engineers.<br><br><strong>Features:</strong> Unlimited generations per month and full history.</p>
-        <div class="badge orange">High-Margin MRR</div>
+      <div class="arrow">→</div>
+      <div class="agent-box">
+        <div class="agent-name">② Treasury</div>
+        <p>Pulls live Wise fee quotes for the user's currency. Picks the lowest-fee send date. Selects Wise vs JP Morgan rail.</p>
       </div>
-
-      <div class="card accent-green">
-        <h3>Tier 3: Enterprise</h3>
-        <div class="big-stat text-green">$50k<span style="font-size: 0.4em; color: var(--text-muted)">+</span></div>
-        <p>Per year, per facility.<br><br><strong>Target:</strong> BMW, Airbus.<br>On-prem deployment, custom model fine-tuning.</p>
-        <div class="badge green">Phase 3 Target</div>
+      <div class="arrow">→</div>
+      <div class="agent-box">
+        <div class="agent-name">③ Operations</div>
+        <p>Generates the invoice, calculates net payout after fees, dispatches payment or escalates for manual approval.</p>
       </div>
     </div>
-  </div>
-
-  <!-- SLIDE 04: GO-TO-MARKET PLAN -->
-  <div class="slide">
-    <div class="s-header">
-      <div class="s-meta"><span class="s-num">04 / 05</span><span class="s-tag">Go-to-Market Plan</span></div>
-      <h1 class="s-title text-gradient">The roadmap to our <span class="text-orange">first 10 customers.</span></h1>
-    </div>
-
-    <div class="s-body grid-2">
-      <div class="card accent-blue">
-        <h3>1. University Robotics Clubs</h3>
-        <p>We provide MechaGen to university engineering teams and robotics clubs for free.<br><br><strong>Grassroots Adoption:</strong> By embedding our tool in student workflows, we build extreme loyalty with the next generation of engineers who will champion MechaGen in the enterprise.</p>
+    <div class="points">
+      <div class="point">
+        <div class="point-icon">🧠</div>
+        <div><strong>Groq + Llama 3.3 70B</strong> — sub-second LLM reasoning per agent via CrewAI orchestration.</div>
       </div>
-
-      <div class="card accent-orange">
-        <h3>2. Events & Social Media</h3>
-        <p><strong>Boots on the ground & digital reach.</strong> We actively attend and organize robotics events, technical conferences, and job fairs.<br><br>This is amplified by targeted <strong>social media promotion</strong>, showcasing live generation demos to build viral adoption among CAD engineers.</p>
+      <div class="point">
+        <div class="point-icon">🔊</div>
+        <div><strong>ElevenLabs voice alerts</strong> — high-value transactions trigger an audible warning in real time.</div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- SLIDE 05: IMAGE FROM IMGUR -->
-  <div class="slide">
-    <div class="s-header">
-      <div class="s-meta"><span class="s-num">05 / 05</span><span class="s-tag">Why Us · The Ask</span></div>
-      <h1 class="s-title text-gradient">The technology window <span class="text-blue">just opened.</span></h1>
-    </div>
-
-    <div class="s-body grid-2">
-      <!-- Left Column: The Team & Ask -->
-      <div style="display: flex; flex-direction: column; gap: clamp(16px, 2.5vh, 32px);">
-        <div class="card accent-green" style="flex: 1;">
-          <h3>Team & Market Timing</h3>
-          <p>Our team brings perfectly <strong>complementary skills</strong> across AI, mechanical engineering, and product scaling, backed by a clear vision to deliver a fully working enterprise solution.<br><br>We are building at the exact intersection of <strong>hyper-growth in both Robotics and AI</strong>—the market mandate is here now.</p>
-        </div>
-        <div class="card" style="background: var(--blue-glow); border-color: rgba(59, 130, 246, 0.5);">
-          <h3>The Ask</h3>
-          <p>We are actively looking for:<br><br>
-            • <strong>Our first pilot customer.</strong><br>
-            • <strong>A technical co-founder</strong> with a deep CAD/CAM background.
-          </p>
-        </div>
+  <!-- ── Slide 4: Integrations ──────────────────────────────────────────── -->
+  <section class="slide" id="s4">
+    <div class="tag">Tech Stack</div>
+    <h1>Built on <span>real</span> infrastructure</h1>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Wise API</div>
+        <p>Live FX fee quotes for <strong>10+ currency pairs</strong>. Real exchange rates, real transfer costs — not estimates.</p>
       </div>
-
-      <!-- Right Column: Static Image -->
-      <div class="media-frame" style="border: none; box-shadow: none;">
-        <img src="https://i.imgur.com/sjpafmo.png" alt="MechaGen Overview" style="border-radius: clamp(16px, 2.5vh, 32px); box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid var(--border);" />
+      <div class="card">
+        <div class="card-title">ElevenLabs</div>
+        <p><strong>Voice alert</strong> fires the moment a high-value payout is detected. Works in any browser, any device.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Groq / Llama 3.3 70B</div>
+        <p>LLM reasoning fast enough for <strong>real-time per-transaction</strong> decisions. Full audit trail on every call.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">FastAPI + SSE</div>
+        <p>Every agent step <strong>streams live</strong> to the dashboard. No polling, no waiting — operators see decisions as they happen.</p>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- ── Slide 5: Competitors ───────────────────────────────────────────── -->
+  <section class="slide" id="s5">
+    <div class="tag">Competitive Landscape</div>
+    <h1>Nobody is doing<br/>this for <span>micro-payouts</span></h1>
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>AI Fraud Layer</th>
+          <th>Fee Optimisation</th>
+          <th>Micro-payment Focus</th>
+          <th>Real-time Pipeline</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="us">
+          <td>MicroPayout AI</td>
+          <td class="check">✓ autonomous</td>
+          <td class="check">✓ live quotes</td>
+          <td class="check">✓ built for it</td>
+          <td class="check">✓ SSE stream</td>
+        </tr>
+        <tr>
+          <td>Stripe Connect</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗ fixed fees</td>
+          <td class="cross">✗ general</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>Tipalti</td>
+          <td class="cross">✗ rules-based</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗ enterprise</td>
+          <td class="cross">✗</td>
+        </tr>
+        <tr>
+          <td>Trolley</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="check">✓ partial</td>
+          <td class="cross">✗</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── Slide 6: Why Now ───────────────────────────────────────────────── -->
+  <section class="slide" id="s6">
+    <div class="tag">Why Now</div>
+    <h1>The API economy<br/>is <span>exploding</span></h1>
+    <p class="subtitle">
+      Three forces are converging that make this the right product at the right moment.
+    </p>
+    <div class="points">
+      <div class="point">
+        <div class="point-icon">📈</div>
+        <div><strong>Creator supply is surging.</strong> The number of API-monetised developers is doubling every 18 months. Platforms are drowning in payout volume they can't handle manually.</div>
+      </div>
+      <div class="point">
+        <div class="point-icon">⚡</div>
+        <div><strong>LLMs are now cheap enough per transaction.</strong> Groq inference costs less than $0.001 per payout decision. AI fraud detection is no longer a luxury reserved for banks.</div>
+      </div>
+      <div class="point">
+        <div class="point-icon">🏦</div>
+        <div><strong>Open banking APIs just became accessible.</strong> Wise, Stripe, and open banking rails now expose the data needed for real-time fee optimisation to any startup — not just JPMorgan.</div>
+      </div>
+      <div class="point">
+        <div class="point-icon">🎯</div>
+        <div><strong>No incumbent owns this space.</strong> Tipalti targets $10M+ enterprises. Stripe Connect ignores fraud. The micro-payout niche is undefended and growing fast.</div>
+      </div>
+    </div>
+  </section>
 
 </div>
 
-<!-- Navigation Controls -->
-<div class="controls">
-  <div style="width: 100px;"></div>
-  <div class="progress-container" id="progressBars">
-    <div class="progress-bar active" onclick="goTo(0)"></div>
-    <div class="progress-bar" onclick="goTo(1)"></div>
-    <div class="progress-bar" onclick="goTo(2)"></div>
-    <div class="progress-bar" onclick="goTo(3)"></div>
-    <div class="progress-bar" onclick="goTo(4)"></div>
-  </div>
-  <div class="nav-arrows">
-    <button class="nav-btn" onclick="prev()">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <button class="nav-btn" onclick="next()">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
-  </div>
+<!-- Navigation -->
+<div class="dots" id="dots"></div>
+
+<div class="nav">
+  <button class="nav-btn" id="prev">←</button>
+  <span class="slide-counter"><span id="cur">1</span> / <span id="tot"></span></span>
+  <button class="nav-btn" id="next">→</button>
 </div>
 
 <script>
-  let cur = 0;
-  const slides = document.querySelectorAll('.slide');
-  const bars = document.querySelectorAll('.progress-bar');
-  let isAnimating = false;
+  const slides = Array.from(document.querySelectorAll('.slide'))
+  const dots = document.getElementById('dots')
+  const curEl = document.getElementById('cur')
+  const totEl = document.getElementById('tot')
+  let current = 0
+
+  totEl.textContent = slides.length
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div')
+    d.className = 'dot' + (i === 0 ? ' active' : '')
+    d.addEventListener('click', () => goTo(i))
+    dots.appendChild(d)
+  })
 
   function goTo(n) {
-    if (n === cur || isAnimating) return;
-    isAnimating = true;
-    
-    slides[cur].classList.remove('active');
-    slides[cur].classList.add('exit');
-    
-    const oldCur = cur;
-    setTimeout(() => {
-      slides[oldCur].classList.remove('exit');
-      isAnimating = false;
-    }, 600); // Matches CSS animation duration
-    
-    cur = n;
-    slides[cur].classList.add('active');
-    bars.forEach((b, i) => b.classList.toggle('active', i === cur));
+    slides[current].classList.remove('active')
+    dots.children[current].classList.remove('active')
+    current = (n + slides.length) % slides.length
+    slides[current].classList.add('active')
+    dots.children[current].classList.add('active')
+    curEl.textContent = current + 1
   }
 
-  function next() { if (cur < slides.length - 1) goTo(cur + 1); }
-  function prev() { if (cur > 0) goTo(cur - 1); }
+  document.getElementById('next').addEventListener('click', () => goTo(current + 1))
+  document.getElementById('prev').addEventListener('click', () => goTo(current - 1))
 
-  // Keyboard Navigation
   document.addEventListener('keydown', e => {
-    if (['ArrowRight', 'ArrowDown', ' ', 'Enter', 'PageDown'].includes(e.key)) { e.preventDefault(); next(); }
-    if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
-  });
-
-  // Touch Swipe Navigation
-  let touchStartX = 0;
-  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
-  document.addEventListener('touchend', e => {
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchEndX - touchStartX;
-    if (Math.abs(diff) > 50) diff < 0 ? next() : prev();
-  });
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') goTo(current + 1)
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1)
+  })
 </script>
 </body>
 </html>
